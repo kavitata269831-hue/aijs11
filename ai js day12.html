@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+     <h1>MINI PROJECT 1</h1>
+    <h3>Employee Management System</h3>
+    <form id="employeeForm">
+        <p id="nameLabel">Name:</p>
+        <input type="text" name="name" id="name" placeholder="Enter name" required/><br>
+        <p id="positionLabel">Position:</p>
+        <input type="text" name="position" id="position" placeholder="Enter position" required/><br>
+        <p id="departmentLabel">Department:</p>
+        <input type="text" name="department" id="department" placeholder="Enter department" required/><br>
+        <input id="addEmployeeButton" type="submit" value="Add Employee">
+        </form>
+    <script type="text/javascript">
+        const employeeForm = document.getElementById('employeeForm');
+
+        employeeForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const position = document.getElementById('position').value;
+            const department = document.getElementById('department').value;
+        });
+    </script><hr><hr>
+    <h1>MINI PROJECT 2</h1>
+<h3>Pallindrome checker</h3>
+<form id="pallindromeForm"> 
+    <p id="wordLabel">Enter Word:</p>
+    <input type="text" name="word" id="word" placeholder="Enter word" required/><br>
+    <input id="checkPallindromeButton" type="submit" value="Check Pallindrome">
+</form>
+<script type="text/javascript">
+    const pallindromeForm = document.getElementById('pallindromeForm');
+
+    pallindromeForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const word = document.getElementById('word').value;
+        const reversedWord = word.split('').reverse().join('');
+        if (word === reversedWord) {
+            alert(word + ' is a palindrome.');
+        } else {
+            alert(word + ' is not a palindrome.');
+        }
+    });
+</script><hr><hr>
+<h1>MINI PROJECT3</h1>
+<H3>Library Book Tracker</H3>
+<div class="container">
+        <h1>My Library</h1>
+        <button id="new-book-btn">Add New Book</button>
+        <div class="form-container" id="form-container">
+            <form id="book-form">
+                <input type="text" id="title" placeholder="Title" required><br>
+                <input type="text" id="author" placeholder="Author" required><br>
+                <input type="number" id="pages" placeholder="Pages" required><br>
+                <label>
+                    <input type="checkbox" id="is-read"> Read?
+                </label><br>
+                <button type="submit">Add Book</button>
+            </form>
+        </div>
+        <div class="library-container" id="library-container">
+        
+        </div>
+    </div>
+    <script>
+        let myLibrary = JSON.parse(localStorage.getItem('library')) || [];
+const newBookBtn = document.getElementById('new-book-btn');
+const formContainer = document.getElementById('form-container');
+const bookForm = document.getElementById('book-form');
+const libraryContainer = document.getElementById('library-container');
+class Book {
+    constructor(title, author, pages, isRead) {
+        this.title = title;
+        this.author = author;
+        this.pages = pages;
+        this.isRead = isRead;
+        this.id = Date.now(); 
+    }
+}
+function addBookToLibrary(title, author, pages, isRead) {
+    const newBook = new Book(title, author, pages, isRead);
+    myLibrary.push(newBook);
+    saveAndRender();
+}
+function render() {
+    libraryContainer.innerHTML = ''; 
+    myLibrary.forEach((book) => {
+        const bookCard = document.createElement('div');
+        bookCard.classList.add('book-card');
+        bookCard.setAttribute('data-id', book.id); // Associate DOM element with book ID
+
+        bookCard.innerHTML = `
+            <h3>${book.title}</h3>
+            <p>Author: ${book.author}</p>
+            <p>Pages: ${book.pages}</p>
+            <p>Status: <span class="${book.isRead ? 'read-status' : 'not-read-status'}">${book.isRead ? 'Read' : 'Not Read Yet'}</span></p>
+            <button onclick="toggleReadStatus(${book.id})">Toggle Read Status</button>
+            <button onclick="removeBook(${book.id})">Remove Book</button>
+        `;
+        libraryContainer.appendChild(bookCard);
+    });
+}
+
+
+function saveAndRender() {
+    localStorage.setItem('library', JSON.stringify(myLibrary));
+    render();
+}
+
+
+function removeBook(id) {
+    myLibrary = myLibrary.filter(book => book.id !== id);
+    saveAndRender();
+}
+
+
+function toggleReadStatus(id) {
+    const book = myLibrary.find(book => book.id === id);
+    if (book) {
+        book.isRead = !book.isRead;
+        saveAndRender();
+    }
+}
+
+
+newBookBtn.addEventListener('click', () => {
+    formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
+});
+
+bookForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const title = document.getElementById('title').value;
+    const author = document.getElementById('author').value;
+    const pages = document.getElementById('pages').value;
+    const isRead = document.getElementById('is-read').checked;
+
+    addBookToLibrary(title, author, pages, isRead);
+    bookForm.reset();
+    formContainer.style.display = 'none';
+});
+
+render();
+
+    </script><hr><hr>
+<h1>MINI PROJECT 4</h1>
+<h3>Pattern Generater</h3>
+<script>
+    function generateLeftTriangle(n) {
+  let output = '';
+  for (let i = 1; i <= n; i++) { 
+    for (let j = 0; j < i; j++) { 
+      output += '* ';
+    }
+    output += '\\n';
+  }
+  console.log(output);
+  document.write(output);
+}
+
+generateLeftTriangle(5);
+
+</script><hr><hr>
+<h1>PROJECT 5</h1>
+<h3>Create a bill splitter </h3>
+<h1>Bill Splitter</h1>
+
+    <label for="totalBill">Total Bill Amount ($):</label>
+    <input type="number" id="totalBill" placeholder="Enter total bill">
+    <br><br>
+    <label for="numPeople">Number of People:</label>
+    <input type="number" id="numPeople" placeholder="Enter number of people">
+    <br><br>
+    <button onclick="calculateAndDisplay()">Calculate</button>
+
+    <h2>Result:</h2>
+    <p id="result">Enter values and click "Calculate"</p>
+<script>
+    function billSplitter(total, numPeople) {
+  // Validate inputs
+  if (isNaN(total) || isNaN(numPeople) || total <= 0 || numPeople <= 0) {
+    document.getElementById('result').innerText = 'Please enter valid numbers for the bill and number of people.';
+    return;
+  }
+
+  const amountPerPerson = total / numPeople;
+  
+  const formattedAmount = amountPerPerson.toFixed(2);
+
+  document.getElementById('result').innerText = `Each person should pay $${formattedAmount}.`;
+}
+
+
+function calculateAndDisplay() {
+  
+  const totalBillInput = document.getElementById('totalBill');
+  const numPeopleInput = document.getElementById('numPeople');
+
+  const totalBill = parseFloat(totalBillInput.value);
+  const numPeople = parseInt(numPeopleInput.value);
+
+  
+  billSplitter(totalBill, numPeople);
+}
+</script><hr><hr>
+    <h1>MINI PROJECT 6</h1>
+<h3>Student Record Management System</h3>
+<form id="studentForm">
+    <p id="studentNameLabel">Student Name:</p>
+    <input type="text" name="studentName" id="studentName" placeholder="Student Name"/><br>
+    <p id="studentIDLabel">Student ID:</p>
+    <input type="text" name="studentID" id="studentID" placeholder="Student ID"/><br>
+    <p id="courseLabel">Course:</p>
+    <input type="text" name="course" id="course" placeholder="Course"/><br><br>
+    <input id="addStudentButton" type="submit" value="Add Student" onclick="addStudent(event)">
+    </form>
+<script type="text/javascript">
+    function addStudent(event) {
+        event.preventDefault(); 
+
+        const studentName = document.getElementById('studentName').value;
+        const studentID = document.getElementById('studentID').value;
+        const course = document.getElementById('course').value;
+
+        if (studentName === '' || studentID === '' || course === '') {
+            alert('Please fill in all fields.');
+            return;
+        }
+
+        alert(`Student Added!\nName: ${studentName}\nStudent ID: ${studentID}\nCourse: ${course}`);
+    }
+    </script>
+</body>
+</html>

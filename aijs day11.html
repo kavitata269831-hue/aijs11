@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+        input[type="text"] {
+            width: calc(100% - 100px);
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            margin-right: 1rem;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+        button {
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            border: none;
+            background: #ff6b6b;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #ff4757;
+        }
+        .todo {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, background 0.3s;
+        }
+        .todo:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .task {
+            flex: 1;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .delete,
+        .edit {
+            cursor: pointer;
+            transition: transform 0.2s, color 0.3s;
+        }
+        .delete:hover {
+            transform: scale(1.1);
+            color: #ff4757;
+        }
+        .edit:hover {
+            transform: scale(1.1);
+            color: #1e90ff;
+        }
+        svg {
+            fill: currentColor;
+        }
+        .container2 {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+form input, form select, form button {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+form button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #218838;
+}
+
+.expense-table table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.expense-table th, .expense-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.expense-table th {
+    background-color: #f8f8f8;
+}
+
+.total-amount {
+    text-align: right;
+    font-size: 18px;
+}
+
+.filter {
+    margin-bottom: 20px;
+    text-align: right;
+}
+
+.filter label {
+    margin-right: 10px;
+}
+
+.filter select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+    </style>
+</head>
+<body>
+    <h1>MINI PROJECT 1</h1>
+    <h3>Stop Watch With session storage </h3>
+    <div id="display">00:00:00</div>
+<button id="startButton">Start</button>
+<button id="pauseButton">Pause</button>
+<button id="resetButton">Reset</button>
+<script>
+    let startTime;
+let updatedTime;
+let difference = 0;
+let tInterval;
+let savedDifference = 0;
+let running = false;
+const display = document.getElementById("display");
+const startButton = document.getElementById("startButton");
+const pauseButton = document.getElementById("pauseButton");
+const resetButton = document.getElementById("resetButton");
+
+// Function to format milliseconds into HH:MM:SS
+function formatTime(ms) {
+    let seconds = Math.floor(ms / 1000);
+    let minutes = Math.floor(seconds / 60);
+    let hours = Math.floor(minutes / 60);
+
+    seconds %= 60;
+    minutes %= 60;
+
+    // Pad with leading zeros
+    const format = (num) => num.toString().padStart(2, '0');
+    return `${format(hours)}:${format(minutes)}:${format(seconds)}`;
+}
+
+// Function to run the stopwatch
+function startStopwatch() {
+    if (!running) {
+        // Check sessionStorage for a saved time difference
+        const savedTime = sessionStorage.getItem("savedDifference");
+        if (savedTime) {
+            savedDifference = parseInt(savedTime);
+        }
+
+        startTime = Date.now() - savedDifference;
+        tInterval = setInterval(updateDisplay, 1000);
+        running = true;
+        startButton.textContent = "Running"; // Optional UI change
+    }
+}
+
+// Function to pause the stopwatch
+function pauseStopwatch() {
+    if (running) {
+        clearInterval(tInterval);
+        savedDifference = Date.now() - startTime;
+        sessionStorage.setItem("savedDifference", savedDifference.toString()); // Save the elapsed time
+        running = false;
+        startButton.textContent = "Start";
+    }
+}
+
+// Function to reset the stopwatch
+function resetStopwatch() {
+    clearInterval(tInterval);
+    savedDifference = 0;
+    difference = 0;
+    running = false;
+    display.textContent = "00:00:00";
+    sessionStorage.removeItem("savedDifference"); 
+    startButton.textContent = "Start";
+}
+function updateDisplay() {
+    updatedTime = Date.now();
+    difference = updatedTime - startTime;
+    display.textContent = formatTime(difference);
+}
+startButton.addEventListener("click", startStopwatch);
+pauseButton.addEventListener("click", pauseStopwatch);
+resetButton.addEventListener("click", resetStopwatch);
+window.onload = () => {
+    const savedTime = sessionStorage.getItem("savedDifference");
+    if (savedTime) {
+        savedDifference = parseInt(savedTime);
+        display.textContent = formatTime(savedDifference);
+    }
+};
+
+</script><hr><hr>
+<h1>MINI PROJECT 2</h1>
+<h3>Notes App With Local storage</h3>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<a class="navbar-brand" href="#">Notes App</a>
+<div class="collapse navbar-collapse" id="navbarSupportedContent">
+<ul class="navbar-nav mr-auto">
+<li class="nav-item active">
+<a class="nav-link" href="#"
+>Home <span class="sr-only">(current)</span></a
+>
+</li>
+</ul>
+<form class="form-inline my-2 my-lg-0">
+<input
+class="form-control mr-sm-2"
+type="search"
+placeholder="Search"
+aria-label="Search"
+/>
+<button class="btn btn-outline-success my-2 my-sm-0" type="submit">
+Search
+</button>
+</form>
+</div>
+</nav>
+<div class="container my-3">
+<h1>Welcome to my notes app</h1>
+<div class="card">
+<div class="card-body">
+<h5 class="card-title">Add note</h5>
+<div class="form-group">
+<textarea class="form-control" id="addTxt" rows="3"></textarea>
+</div>
+<button class="btn btn-primary" id="addBtn">Add Note</button>
+</div>
+</div>
+<hr>
+<h1>Your Notes</h1>
+<hr>
+<div id="notes" class="row container-fluid">
+</div>
+</div>
+<script>
+    showNotes();
+let addBtn= document.getElementById("addBtn");
+addBtn.addEventListener("click", function(e){
+let addTxt= document.getElementById("addTxt");
+let notes= localStorage.getItem("notes");
+if(addTxt.value.length==0){
+alert("add some notes")
+}
+else{
+if(notes==null){
+notesObj= [];
+}
+else{
+notesObj= JSON.parse(notes);
+}
+notesObj.push(addTxt.value);
+localStorage.setItem("notes", JSON.stringify(notesObj));
+addTxt.value= "";
+showNotes();
+}
+})
+function showNotes(){
+let notes= localStorage.getItem("notes");
+if(notes==null){
+notesObj= [];
+}
+else{
+notesObj= JSON.parse(notes);
+}
+let html= "";
+notesObj.forEach(function(item,index) {
+html+= ` <div class="noteCard my-2 mx-2 card" style="width: 18rem">
+<div class="card-body">
+<h5 class="card-title">Note ${index+1}</h5>
+<p class="card-text">${item}</p>
+<button id= "${index}" onclick= "deleteNote(this.id)" class="btn btn-primary">Delete Note</button>
+</div>
+</div>`
+});
+let notesEle= document.getElementById("notes");
+if(notesObj.length !=0 ){
+notesEle.innerHTML=html;
+}
+else{
+notesEle.innerHTML= `Nothing to show! Use "Add a Note" section to add note`
+}
+}
+function deleteNote(index){
+let notes= localStorage.getItem("notes");
+if(notes==null){
+notesObj= [];
+}
+else{
+notesObj= JSON.parse(notes);
+}
+notesObj.splice(index,1);
+localStorage.setItem("notes", JSON.stringify(notesObj));
+showNotes();
+}
+</script><hr><hr>
+<h1>MINI PROJECT 3</h1>
+<h3>To do list with Persistent storage </h3>
+ <div class="container">
+        <input type="text" placeholder="Add a new task...">
+        <button>Add</button>
+        <div id="task-list"></div>
+    </div>
+<script>
+    let inputs = document.querySelector('input');
+let btn = document.querySelector('button');
+let taskList = document.getElementById('task-list');
+let task = [];
+let localstoragedata = localStorage.getItem("task array");
+
+if (localstoragedata != null) {
+    let ogdata = JSON.parse(localstoragedata);
+    task = ogdata;
+    maketodo();
+}
+
+btn.addEventListener("click", function() {
+    let query = inputs.value;
+    inputs.value = "";
+    if (query.trim() === "") {
+        alert("no value entered");
+        throw new Error("empty input field error");
+    }
+
+    let taskObj = {
+        id: Date.now(),
+        text: query
+    }
+    task.push(taskObj);
+    localStorage.setItem("task array", JSON.stringify(task));
+    maketodo();
+});
+
+function maketodo() {
+    taskList.innerHTML = "";
+    for (let i = 0; i < task.length; i++) {
+        let { id, text } = task[i];
+        let element = document.createElement('div');
+        element.innerHTML = `
+            <span class="task" contenteditable="false">${text}</span>
+            <button class='edit'>Edit</button>
+            <span class="delete"><svg xmlns="https://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M17 6H22V8H20V21C20 21.5523 19.5523 22 19 22H5C4.44772 22 4 21.5523 4 21V8H2V6H7V3C7 2.44772 7.44772 2 8 2H16C16.5523 2 17 2.44772 17 3V6ZM18 8H6V20H18V8ZM13.4142 13.9997L15.182 15.7675L13.7678 17.1817L12 15.4139L10.2322 17.1817L8.81802 15.7675L10.5858 13.9997L8.81802 12.232L10.2322 10.8178L12 12.5855L13.7678 10.8178L15.182 12.232L13.4142 13.9997ZM9 4V6H15V4H9Z"></path></svg></span>
+        `;
+        let delbtn = element.querySelector('.delete');
+        let editbtn = element.querySelector('.edit');
+        let taskText = element.querySelector('.task');
+
+        // Delete Task
+        delbtn.addEventListener("click", function() {
+            let filteredarray = task.filter(function(taskobj) {
+                return taskobj.id != id;
+            });
+            task = filteredarray;
+            localStorage.setItem("task array", JSON.stringify(task));
+            taskList.removeChild(element);
+        });
+
+        // Edit Task
+        editbtn.addEventListener("click", function() {
+            if (editbtn.innerText === 'Edit') {
+                taskText.setAttribute('contenteditable', 'true'); // Enable editing
+                taskText.focus(); // Focus on the text to start editing
+                editbtn.innerText = 'Save'; // Change button text to 'Save'
+            } else {
+                taskText.setAttribute('contenteditable', 'false'); // Disable editing
+                let updatedText = taskText.innerText.trim();
+                if (updatedText !== "") {
+                    task = task.map(function(taskobj) {
+                        if (taskobj.id === id) {
+                            taskobj.text = updatedText;
+                        }
+                        return taskobj;
+                    });
+                    localStorage.setItem("task array", JSON.stringify(task));
+                }
+                editbtn.innerText = 'Edit'; // Change button text back to 'Edit'
+            }
+        });
+
+        element.classList.add('todo');
+        taskList.appendChild(element);
+    }
+}
+</script><hr><hr>
+<h1>MINI PROJECT 4</h1>
+<h3>Persistent Survey Form</h3>
+
+
+<div class="container1" style="margin-top: 5%">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Create New Survey:</div>
+                        <div class="panel-group">
+                            <form action="?php $_SERVER['PHP_SELF']; ?>" method="POST" class="form-control" style="height: 700px; border: none" id="survey-form">
+                                <label>Survey Title: </label>
+                                    <input name="survey_title" id="survey_title" type="text" class="form-control input-group"/>
+                                    <input name="qnum" id="qnum" type="hidden" value=""/>
+                                    <input name="choicenum" id="choicenum" type="hidden" value=""/>
+                                <label>Survey Questions:</label>
+                                <div id="questions">
+                                </div>
+                                <button class="btn btn-primary" type="button"style="display: block; margin-top: 5px;" id="addq"><span class="glyphicon glyphicon-plus"></span>Add a question</button>
+                                    <button class="btn btn-success" type="submit" id="uploadsurvey" name="uploadsurvey" style="display: block; margin-top: 10px">Upload Survey</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+<script>
+
+    $(document).ready(function(){
+    var i=0;
+    var numOfQuestions=0;
+    var choice_c = 1;
+    $("#addq").click(function(){
+            numOfQuestions++;
+            i++;
+            $("#questions").append("<div id='newq' style='margin-top: 5px; margin-bottom: 5px'></div>");
+            $("#newq").append("Question: <input type='text' name='q"+i+"' class='form-control' style='display: inline-block' id='q"+i+"'/>");
+            $("#qnum").attr("value", numOfQuestions);
+            $("#newq").append("<label><input type='radio' name='radio"+i+"' value='radio' class='choices radiobox' id='radiobox"+i+"'/>&nbsp;Radiobox&nbsp;&nbsp;</label>");
+            $("#newq").append("<label><input type='radio' name='radio"+i+"' value='check' class='choices checkbox' id='checkbox"+i+"'/>&nbsp;Checkbox&nbsp;&nbsp;</label>");
+            $("#newq").append("<label><input type='radio' name='radio"+i+"' value='text' class='choices textbox' id='textbox"+i+"'/>&nbsp;Text&nbsp;&nbsp;</label>");
+            $("#newq").append("<input type='text' class='form-control qchoice' name='radiochoice"+choice_c+"_q"+i+"' id='radiochoice"+choice_c+"' title='q"+i+"' style='display: none'/>");
+            choice_c++;
+            $("#newq").append("<input type='text' class='form-control qchoice' name='radiochoice"+choice_c+"_q"+i+"' id='radiochoice"+choice_c+"' title='q"+i+"' style='display: none'/>");
+            choice_c++;
+            $("#newq").append("<button id='radiobtn"+i+"' type='button' class='btn btn-primary add-radio-choice' style='display: none'><span class='glyphicon glyphicon-plus'></span>Add choices</button>");
+            $("#newq").append("<button id='checkbtn"+i+"' type='button' class='btn btn-primary add-checkbox-choice' style='display: none'><span class='glyphicon glyphicon-plus'></span>Add choices</button>");
+        });
+        $(document.body).on('change', '.choices' ,function() {
+            if ($(".radiobox").is(":checked")) {
+                $(".add-radio-choice").show();
+                $(".qchoice").show();
+                $(".add-checkbox-choice").hide();
+            }
+            else if ($(".checkbox").is(":checked")) {
+                $(".add-checkbox-choice").show();
+                $(".add-radio-choice").hide();
+                $(".qchoice").show();
+            }
+            else if($(".textbox").is(":checked")){
+                $(".add-checkbox-choice").hide();
+                $(".add-radio-choice").hide();
+                $(".qchoice").hide();
+            }
+        });
+        $(document.body).on('click', '.add-radio-choice' ,function(){
+            $("#newq").append("Choice: <input type='text' name='radiochoice"+choice_c+"_q"+i+"' title='q"+i+"' class='form-control qchoice' id='radiochoice"+choice_c+"'/>");
+            $("#choicenum").attr("value", choice_c);
+        });
+        $(document.body).on('click', '.add-checkbox-choice' ,function(){
+            $("#newq").append("<input type='text' name='radiochoice"+choice_c+"_q"+i+"' title='q"+i+"' class='form-control qchoice' id='checkboxchoice"+choice_c+"'>");
+            $("#choicenum").attr("value", choice_c);
+        });
+});
+
+    </script><hr><hr>
+<h1>MINI PROJECT 5</h1>
+<h3>Add to cart with Search functionlity</h3>
+<!-- Search Input -->
+<input type="text" id="search-input" placeholder="Search products...">
+
+<!-- Product List (data-name attribute used for filtering) -->
+<div id="product-list">
+    <div class="product-item" data-name="Laptop">
+        Laptop - $1000
+        <button onclick="addToCart('prod1')">Add to Cart</button>
+    </div>
+    <div class="product-item" data-name="Mouse">
+        Mouse - $20
+        <button onclick="addToCart('prod2')">Add to Cart</button>
+    </div>
+    <div class="product-item" data-name="Keyboard">
+        Keyboard - $50
+        <button onclick="addToCart('prod3')">Add to Cart</button>
+    </div>
+</div>
+
+<!-- Cart Count Display -->
+<p>Items in cart: <span id="cart-count">0</span></p>
+
+<script>
+// Function to filter products based on search query
+function filterProducts() {
+    const searchQuery = document.getElementById('search-input').value.toLowerCase();
+    const productList = document.getElementById('product-list');
+    const products = productList.getElementsByClassName('product-item');
+
+    for (let i = 0; i < products.length; i++) {
+        const productName = products[i].getAttribute('data-name').toLowerCase();
+        if (productName.includes(searchQuery)) {
+            products[i].style.display = ''; // Show product
+        } else {
+            products[i].style.display = 'none'; // Hide product
+        }
+    }
+}
+
+// Add an event listener to the search input
+document.getElementById('search-input').addEventListener('input', filterProducts);
+// Function to get cart items from localStorage
+function getCart() {
+    const cart = localStorage.getItem('shoppingCart');
+    return cart ? JSON.parse(cart) : {};
+}
+
+// Function to save cart items to localStorage
+function saveCart(cart) {
+    localStorage.setItem('shoppingCart', JSON.stringify(cart));
+}
+
+// Function to add an item to the cart
+function addToCart(productId) {
+    const cart = getCart();
+    if (cart[productId]) {
+        cart[productId]++;
+    } else {
+        cart[productId] = 1;
+    }
+    saveCart(cart);
+    updateCartUI();
+    alert(`Product ${productId} added to cart!`);
+}
+
+// Function to update the cart display (UI)
+function updateCartUI() {
+    const cart = getCart();
+    const cartCountElement = document.getElementById('cart-count');
+    let totalItems = 0;
+    for (const id in cart) {
+        totalItems += cart[id];
+    }
+    cartCountElement.textContent = totalItems;
+}
+// Call this function when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', (event) => {
+    updateCartUI();
+});
+
+
+</script><hr><hr>
+<h1>MINI PROJECT 6</h1>
+<h3>Expence tracker in local storage</h3>
+<div class="container2">
+        <h1>Expense Tracker</h1>
+        <form id="expense-form">
+            <input type="text" id="expense-name" placeholder="Expense Name" required />
+            <input type="number" id="expense-amount" placeholder="Amount" required />
+            <select id="expense-category" required>
+                <option value="" disabled selected>Select Category</option>
+                <option value="Food">Food</option>
+                <option value="Transport">Transport</option>
+                <option value="Entertainment">Entertainment</option>
+                <option value="Other">Other</option>
+            </select>
+            <input type="date" id="expense-date" required />
+            <button type="submit">Add Expense</button>
+        </form>
+        <div class="expense-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Expense Name</th>
+                        <th>Amount</th>
+                        <th>Category</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="expense-list"></tbody>
+            </table>
+            <div class="total-amount">
+                <strong>Total:</strong> $<span id="total-amount">0</span>
+            </div>
+        </div>
+        <div class="filter">
+            <label for="filter-category">Filter by Category:</label>
+            <select id="filter-category">
+                <option value="All">All</option>
+                <option value="Food">Food</option>
+                <option value="Transport">Transport</option>
+                <option value="Entertainment">Entertainment</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+    </div>
+<script>
+//script.js
+document.addEventListener("DOMContentLoaded", () => {
+    const expenseForm = document.getElementById("expense-form");
+    const expenseList = document.getElementById("expense-list");
+    const totalAmount = document.getElementById("total-amount");
+    const filterCategory = document.getElementById("filter-category");
+
+    let expenses = [];
+
+    expenseForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById("expense-name").value;
+        const amount = parseFloat(document.getElementById("expense-amount").value);
+        const category = document.getElementById("expense-category").value;
+        const date = document.getElementById("expense-date").value;
+
+        const expense = {
+            id: Date.now(),
+            name,
+            amount,
+            category,
+            date
+        };
+
+        expenses.push(expense);
+        displayExpenses(expenses);
+        updateTotalAmount();
+
+        expenseForm.reset();
+    });
+
+    expenseList.addEventListener("click", (e) => {
+        if (e.target.classList.contains("delete-btn")) {
+            const id = parseInt(e.target.dataset.id);
+            expenses = expenses.filter(expense => expense.id !== id);
+            displayExpenses(expenses);
+            updateTotalAmount();
+        }
+
+        if (e.target.classList.contains("edit-btn")) {
+            const id = parseInt(e.target.dataset.id);
+            const expense = expenses.find(expense => expense.id === id);
+
+            document.getElementById("expense-name").value = expense.name;
+            document.getElementById("expense-amount").value = expense.amount;
+            document.getElementById("expense-category").value = expense.category;
+            document.getElementById("expense-date").value = expense.date;
+
+            expenses = expenses.filter(expense => expense.id !== id);
+            displayExpenses(expenses);
+            updateTotalAmount();
+        }
+    });
+
+    filterCategory.addEventListener("change", (e) => {
+        const category = e.target.value;
+        if (category === "All") {
+            displayExpenses(expenses);
+        } else {
+            const filteredExpenses = expenses.filter(expense => expense.category === category);
+            displayExpenses(filteredExpenses);
+        }
+    });
+
+    function displayExpenses(expenses) {
+        expenseList.innerHTML = "";
+        expenses.forEach(expense => {
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${expense.name}</td>
+                <td>$${expense.amount.toFixed(2)}</td>
+                <td>${expense.category}</td>
+                <td>${expense.date}</td>
+                <td>
+                    <button class="edit-btn" data-id="${expense.id}">Edit</button>
+                    <button class="delete-btn" data-id="${expense.id}">Delete</button>
+                </td>
+            `;
+
+            expenseList.appendChild(row);
+        });
+    }
+
+    function updateTotalAmount() {
+        const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+        totalAmount.textContent = total.toFixed(2);
+    }
+});
+</script>
+</body>
+</html>
